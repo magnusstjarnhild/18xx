@@ -2,6 +2,7 @@
 
 require_relative '../../../step/base'
 require_relative '../../../step/passable_auction'
+require_relative '../../../step/share_buying'
 
 module Engine
   module Game
@@ -9,8 +10,9 @@ module Engine
       module Step
         class SingleItemAuction < Engine::Step::Base
           include Engine::Step::PassableAuction
+          include Engine::Step::ShareBuying
 
-          ACTIONS = %w[bid pass].freeze
+          ACTIONS = %w[par bid pass].freeze
 
           attr_reader :companies
 
@@ -20,8 +22,11 @@ module Engine
               @bids[@auctioning].none? { |bid| bid.entity == entity.owner }
               return ['choose_ability']
             end
+            return [] unless entity == current_entity
 
-            entity == current_entity ? ACTIONS : []
+            actions = %w[bid pass]
+            actions << 'par' if @auctioning && @bids[@auctioning].none? { |bid| bid.entity == entity }
+            actions
           end
 
           def active_auction
@@ -58,6 +63,12 @@ module Engine
             [@companies[0]]
           end
 
+          def can_buy?(_entity, bundle)
+            return unless bundle&.buyable
+
+            true
+          end
+
           def choices_ability(entity)
             return {} if !entity.company? || (entity.company? && !@game.stock_turn_token_company?(entity))
 
@@ -79,7 +90,9 @@ module Engine
           def get_par_prices(entity, corp = nil)
             par_type = @game.phase_par_type
             par_prices = @game.par_prices_sorted.select do |p|
-              p.types.include?(par_type) && p.price <= entity.cash && @game.can_par_share_price?(p, corp)
+              multiplier = corp.nil? ? 1 : 2
+              p.types.include?(par_type) && (p.price * multiplier) <= entity.cash &&
+                @game.can_par_share_price?(p, corp)
             end
             par_prices.reject! { |p| p.price == @game.class::MAX_PAR_VALUE } if par_prices.size > 1
             par_prices
@@ -128,6 +141,10 @@ module Engine
             next_entity!
           end
 
+          def par_corporations
+            @game.sorted_corporations.reject { |c| c.closed? || c.ipoed || !@game.corporation?(c) }
+          end
+
           def process_choose_ability(action)
             entity = action.entity
             choice = action.choice
@@ -142,6 +159,20 @@ module Engine
             @game.purchase_stock_turn_token(entity.owner, share_price)
             @game.stock_turn_token_name!(entity)
             pass_entity(entity.owner, true)
+          end
+
+          def process_par(action)
+            share_price = action.share_price
+            corporation = action.corporation
+            entity = action.entity
+            raise GameError, "#{corporation.name} cannot be parred" unless @game.can_par?(corporation, entity)
+
+            @game.stock_market.set_par(corporation, share_price)
+            share = corporation.ipo_shares.first
+            buy_shares(entity, share.to_bundle)
+            @game.after_par(corporation)
+
+            pass_entity(entity, true)
           end
 
           def process_pass(action)
@@ -170,6 +201,10 @@ module Engine
             @companies = @game.companies.reject { |c| @game.stock_turn_token_company?(c) }
 
             auction_log(@companies[0]) unless @companies.empty?
+          end
+
+          def show_stock_market?
+            true
           end
 
           def starting_bid(company)
