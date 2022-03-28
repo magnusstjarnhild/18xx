@@ -1258,9 +1258,8 @@ module Engine
         def price_movement_chart
           [
             ['Market Action', 'Movement'],
-            ['ST action pass', '3 →'],
-            ['ST action sell (with no buy)', '2 →'],
-            ['ST action buy', '1 →'],
+            ['ST action pass', '2 →'],
+            ['ST action sell or buy', '1 →'],
             ['ST action sell and buy', 'none'],
             ['Dividend 0', '1 ←'],
             ['Dividend > 0', 'none'],
