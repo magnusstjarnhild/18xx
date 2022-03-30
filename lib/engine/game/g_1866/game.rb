@@ -462,11 +462,11 @@ module Engine
               'IT' => %w[SSFL IFT SFAI],
             },
             'region_corporations_maxcount' => {
-              'GB' => 2,
+              'GB' => 3,
               'FR' => 3,
-              'AHE' => 2,
-              'DE' => 2,
-              'IT' => 2,
+              'AHE' => 3,
+              'DE' => 3,
+              'IT' => 3,
             },
           },
           'nes' => {
