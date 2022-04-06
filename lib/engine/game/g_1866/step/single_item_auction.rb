@@ -50,7 +50,7 @@ module Engine
                               .compact
                               .sort
                               .join(', ')
-            privates_left_str = "In alphabetical order, these are left for auction #{privates_left}."
+            privates_left_str = "In alphabetical order, the following items remain to be auctioned: #{privates_left}."
             privates_left_str = 'Last one.' if privates_left.empty?
             @game.log << "#{entity.name} is up for auction. #{privates_left_str}"
             @auction_start_entity = entities[entity_index]
