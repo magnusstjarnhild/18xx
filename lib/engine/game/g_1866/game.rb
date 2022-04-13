@@ -6,6 +6,7 @@ require_relative 'map'
 require_relative '../base'
 require_relative '../../loan'
 require_relative '../interest_on_loans'
+require_relative '../cities_plus_towns_route_distance_str'
 
 module Engine
   module Game
@@ -15,6 +16,7 @@ module Engine
         include G1866::Entities
         include G1866::Map
         include InterestOnLoans
+        include CitiesPlusTownsRouteDistanceStr
 
         GAME_END_CHECK = {
           stock_market: :current_round,
