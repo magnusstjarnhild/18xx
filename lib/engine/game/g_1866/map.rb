@@ -587,23 +587,21 @@ module Engine
 
             # France - H8 I1 I3 I5 I7 I9 J0 J2 J4 J6 J8 J10 J12 K1 K3 K5 K7 K9 K11 K13 L2 L4 L6 L8 L10
             #          M3 M5 M7 M9 M11 N2 N4 N6 N8 N10 O3 O5 O7 O9 O11 P6 P8 P10 P12 Q13
-            ['H8'] =>
+            %w[H8 I5] =>
               'city=revenue:0;border=edge:2,type:impassable;frame=color:#fffbcc',
-            %w[I9 J10 K9 M9 O5] =>
+            %w[I9 J10 K9 K13 M9 O5] =>
               'city=revenue:0;frame=color:#fffbcc',
             ['I1'] =>
               'city=revenue:0;icon=image:1866/port,sticky:1;frame=color:#fffbcc',
-            ['I5'] =>
-              'city=revenue:0;upgrade=cost:20,terrain:swamp;border=edge:2,type:impassable;frame=color:#fffbcc',
-            %w[K1 K3 K13] =>
+            %w[K1 K3] =>
               'city=revenue:0;upgrade=cost:20,terrain:swamp;frame=color:#fffbcc',
             ['N2'] =>
-              'city=revenue:0;upgrade=cost:40,terrain:swamp;border=edge:0,type:impassable;label=Y;'\
+              'city=revenue:0;upgrade=cost:20,terrain:swamp;border=edge:0,type:impassable;label=Y;'\
               'icon=image:1866/port,sticky:1;frame=color:#fffbcc',
             %w[O7 P12] =>
               'city=revenue:0;upgrade=cost:60,terrain:hill;frame=color:#fffbcc',
             ['P10'] =>
-              'city=revenue:0;upgrade=cost:60,terrain:hill;label=Y;icon=image:1866/port,sticky:1;'\
+              'city=revenue:0;upgrade=cost:40,terrain:hill;label=Y;icon=image:1866/port,sticky:1;'\
               'frame=color:#fffbcc',
             %w[I7 J4 J8 K7 L2 L4 L6 L10 N4 N8] =>
               'frame=color:#fffbcc',

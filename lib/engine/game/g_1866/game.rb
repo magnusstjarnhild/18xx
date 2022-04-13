@@ -688,6 +688,7 @@ module Engine
         }.freeze
 
         DOUBLE_HEX = %w[G15 G19 J12 J18 K5].freeze
+        E_TRAINS = %w[3E 4E 5E 6E].freeze
 
         ENTITY_STATUS_TEXT = {
           'DE' => 'Converted by PRU president or force convert in phase 5',
@@ -1844,6 +1845,7 @@ module Engine
             stops = route.visited_stops
             phase = route.phase
             train = route.train
+            e_train = self.class::E_TRAINS.include?(train.name)
             train_multiplier = train.obsolete ? 0.5 : 1
 
             # Transit hub & palace_car
@@ -1852,7 +1854,7 @@ module Engine
             stops.each do |stop|
               next if !stop || (!stop.city? && !stop.offboard?)
 
-              palace_car_revenue += 10
+              palace_car_revenue += 10 if !e_train || (e_train && stop.tokened_by?(entity))
               next if !stop.city? || !stop.tokened_by?(entity)
 
               stop_base_revenue = stop.route_base_revenue(phase, train)
