@@ -608,21 +608,24 @@ module Engine
         }.freeze
 
         C_TILE_UPGRADE = {
-          'C1' => 'C6',
-          'C2' => 'C7',
-          'C3' => 'C8',
-          'C4' => 'C9',
-          'C5' => 'C10',
-          'C6' => 'C11',
-          'C7' => 'C12',
-          'C8' => 'C13',
-          'C9' => 'C14',
-          'C10' => 'C15',
-          'C11' => 'C16',
-          'C12' => 'C17',
-          'C13' => 'C18',
-          'C14' => 'C19',
-          'C15' => 'C20',
+          'C1' => 'C7',
+          'C2' => 'C8',
+          'C3' => 'C9',
+          'C4' => 'C10',
+          'C5' => 'C11',
+          'C6' => 'C12',
+          'C7' => 'C13',
+          'C8' => 'C14',
+          'C9' => 'C15',
+          'C10' => 'C16',
+          'C11' => 'C17',
+          'C12' => 'C18',
+          'C13' => 'C19',
+          'C14' => 'C20',
+          'C15' => 'C21',
+          'C16' => 'C22',
+          'C17' => 'C23',
+          'C18' => 'C24',
         }.freeze
 
         COMPANY_STARTING_BID = {
@@ -722,8 +725,6 @@ module Engine
 
         LONDON_HEX = 'F6'
         LONDON_TILE = 'L1'
-        PARIS_HEX = 'J6'
-        PARIS_TILE = 'P1'
 
         MAX_PAR_VALUE = 200
 
@@ -1372,9 +1373,6 @@ module Engine
           @london_reservation_entity = corporation_by_id('L')
           @corporations.delete(@london_reservation_entity)
 
-          @paris_reservation_entity = corporation_by_id('P')
-          @corporations.delete(@paris_reservation_entity)
-
           @current_turn = 'ISR'
 
           @major_national_formed = {}
@@ -1543,9 +1541,6 @@ module Engine
           # London
           return to.name == self.class::LONDON_TILE if from.hex.name == self.class::LONDON_HEX && from.color == :brown
 
-          # Paris
-          return to.name == self.class::PARIS_TILE if from.hex.name == self.class::PARIS_HEX && from.color == :brown
-
           # C-tiles
           return C_TILE_UPGRADE[from.name] == to.name if from.label.to_s == 'C' && %i[yellow green brown].include?(from.color)
 
@@ -1625,18 +1620,7 @@ module Engine
 
           if corporation.loans.size.positive?
             loan = corporation.loans.size * loan_value
-            corporation_cash = corporation.cash - loan
-            loan_str = "#{corporation.name} have loans of value #{format_currency(loan)}."
-            if corporation_cash.negative?
-              player = corporation.owner
-              @log << "#{loan_str} #{corporation.name} pays #{format_currency(corporation.cash)}, and #{player.name}"\
-                      " have to contribute #{format_currency(corporation_cash.abs)}"
-              player_spend(player, corporation_cash.abs)
-              corporation.spend(corporation.cash, @bank) if corporation.cash.positive?
-            else
-              @log << "#{loan_str} #{corporation.name} pays #{format_currency(loan)}"
-              corporation.spend(loan, @bank)
-            end
+            @log << "The bank settles #{corporation.name} loans of value #{format_currency(loan)}"
             corporation.loans.dup.each do |l|
               corporation.loans.delete(l)
               @loans << l
@@ -2236,10 +2220,8 @@ module Engine
             5
           when 4
             4
-          when 5, 6
+          when 5, 6, 7
             3
-          when 7
-            2
           end
         end
 
