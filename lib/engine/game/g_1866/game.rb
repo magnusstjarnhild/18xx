@@ -407,7 +407,7 @@ module Engine
           {
             name: 'P',
             distance: 99,
-            price: 80,
+            price: 75,
           },
           {
             name: 'H',
