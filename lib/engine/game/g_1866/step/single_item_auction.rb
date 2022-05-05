@@ -89,13 +89,11 @@ module Engine
 
           def get_par_prices(entity, corp = nil)
             par_type = @game.phase_par_type
-            par_prices = @game.par_prices_sorted.select do |p|
+            @game.par_prices_sorted.select do |p|
               multiplier = corp.nil? ? 1 : 2
               p.types.include?(par_type) && (p.price * multiplier) <= entity.cash &&
                 @game.can_par_share_price?(p, corp)
             end
-            par_prices.reject! { |p| p.price == @game.class::MAX_PAR_VALUE } if par_prices.size > 1 || corp.nil?
-            par_prices
           end
 
           def may_purchase?(_company)

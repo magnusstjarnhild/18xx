@@ -62,7 +62,7 @@ module Engine
           %w[0c 10 20 30 40 45 50p 55p 60p 65p 70p 75p 80x 90x 100x 110x 120z 135z 150z 165w 180w
              200 220 240 260 280 300 325 350 375 400 430 460e 490e 520e 560em 600e],
           %w[0c 10 20 30 40 45 50 55 60p 65p 70p 75p 80p 90p 100p 110x 120x 135x 150z 165z 180w
-             200pxzw 220 240 260 280 300 325 350 375 400 430 460e 490e 520e 560em 600e],
+             200w 220 240 260 280 300 325 350 375 400 430 460e 490e 520e 560em 600e],
           %w[0P 0P 0P 0P 0P 0P 0P 0P 0P 0P],
         ].freeze
 
@@ -725,8 +725,6 @@ module Engine
 
         LONDON_HEX = 'F6'
         LONDON_TILE = 'L1'
-
-        MAX_PAR_VALUE = 200
 
         MINOR_COMPANIES = %w[M1 M2 M3 M4 M5 M6 M7 M8 M9 M10].freeze
         MINOR_COMPANY_CORPORATION = {
@@ -1591,10 +1589,9 @@ module Engine
         end
 
         def can_par_share_price?(share_price, corporation)
-          return (share_price.corporations.empty? || share_price.price == self.class::MAX_PAR_VALUE) unless corporation
+          return share_price.corporations.empty? unless corporation
 
-          share_price.corporations.none? { |c| c.type != :stock_turn_corporation } ||
-            share_price.price == self.class::MAX_PAR_VALUE
+          share_price.corporations.none? { |c| c.type != :stock_turn_corporation }
         end
 
         def can_take_loan?(entity)
@@ -1778,11 +1775,9 @@ module Engine
 
         def forced_formation_par_prices(corporation)
           par_type = phase_par_type
-          par_prices = par_prices_sorted.select do |p|
+          par_prices_sorted.select do |p|
             p.types.include?(par_type) && can_par_share_price?(p, corporation)
           end
-          par_prices.reject! { |p| p.price == self.class::MAX_PAR_VALUE } if par_prices.size > 1
-          par_prices
         end
 
         def hex_is_port?(hex)
