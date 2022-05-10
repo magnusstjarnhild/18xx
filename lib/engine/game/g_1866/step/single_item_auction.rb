@@ -12,20 +12,19 @@ module Engine
           include Engine::Step::PassableAuction
           include Engine::Step::ShareBuying
 
-          ACTIONS = %w[par bid pass].freeze
-
           attr_reader :companies
 
           def actions(entity)
             return [] if available.empty?
-            if entity.company? && !choices_ability(entity).empty? && @auctioning &&
-              @bids[@auctioning].none? { |bid| bid.entity == entity.owner }
+            if entity.company? && !choices_ability(entity).empty? && @auctioning && !player_bid?(entity.owner)
               return ['choose_ability']
             end
             return [] unless entity == current_entity
 
-            actions = %w[bid pass]
-            actions << 'par' if @auctioning && @bids[@auctioning].none? { |bid| bid.entity == entity }
+            actions = []
+            actions << 'bid' if min_bid(@auctioning) <= entity.cash
+            actions << 'par' if @auctioning && !player_bid?(entity)
+            actions << 'pass'
             actions
           end
 
@@ -42,6 +41,22 @@ module Engine
             end
 
             super
+          end
+
+          def auction_entity(entity)
+            @auctioning = entity
+            min = min_bid(@auctioning)
+            @active_bidders, cannot_bid = initial_auction_entities.partition do |player|
+              max_bid(player, @auctioning) >= min || can_buy_stockturn_token?(player) ||
+                can_par_corporation?(player)
+            end
+            cannot_bid.each do |player|
+              @game.log << "#{player.name} cannot bid, buy a stock turn token or par a corporation"\
+                           " and is out of the auction for #{auctioning.name}"
+              player.pass!
+            end
+            next_entity! if !@active_bidders.empty? && @auction_start_entity&.passed?
+            resolve_bids
           end
 
           def auction_log(entity)
@@ -69,6 +84,34 @@ module Engine
             true
           end
 
+          def can_buy_stockturn_token?(player)
+            return false if player_bid?(player)
+
+            st_company = player.companies.find { |c| @game.stock_turn_token_company?(c) }
+            !choices_ability(st_company).empty?
+          end
+
+          def can_par_corporation?(player)
+            return false if player_bid?(player)
+
+            !par_corporations(player).empty?
+          end
+
+          def check_remove_from_auction(bid_entity = nil)
+            # Remove players who cannot afford the bid, buy a stock turn token or par corporation
+            min = min_bid(@auctioning)
+            passing = @active_bidders.reject do |player|
+              (bid_entity && player == bid_entity) || max_bid(player, @auctioning) >= min ||
+                can_buy_stockturn_token?(player) || can_par_corporation?(player)
+            end
+            passing.each do |player|
+              @game.log << "#{player.name} cannot bid, buy a stock turn token or par a corporation"\
+                           " and is out of the auction for #{auctioning.name}"
+              remove_from_auction(player)
+              player.pass!
+            end
+          end
+
           def choices_ability(entity)
             return {} if !entity.company? || (entity.company? && !@game.stock_turn_token_company?(entity))
 
@@ -94,6 +137,10 @@ module Engine
               p.types.include?(par_type) && (p.price * multiplier) <= entity.cash &&
                 @game.can_par_share_price?(p, corp)
             end
+          end
+
+          def player_bid?(player)
+            @bids[@auctioning].any? { |bid| bid.entity == player }
           end
 
           def may_purchase?(_company)
@@ -139,8 +186,12 @@ module Engine
             next_entity!
           end
 
-          def par_corporations
-            @game.sorted_corporations.reject { |c| c.closed? || c.ipoed || !@game.corporation?(c) }
+          def par_corporations(entity)
+            return [] if !entity || !entity.player?
+
+            @game.sorted_corporations.reject do |c|
+              c.closed? || c.ipoed || !@game.corporation?(c) || get_par_prices(entity, c).empty?
+            end
           end
 
           def process_choose_ability(action)
@@ -156,6 +207,7 @@ module Engine
 
             @game.purchase_stock_turn_token(entity.owner, share_price)
             @game.stock_turn_token_name!(entity)
+            check_remove_from_auction if @auctioning
             pass_entity(entity.owner, true)
           end
 
@@ -170,6 +222,7 @@ module Engine
             buy_shares(entity, share.to_bundle)
             @game.after_par(corporation)
 
+            check_remove_from_auction if @auctioning
             pass_entity(entity, true)
           end
 
@@ -215,9 +268,21 @@ module Engine
             company = bid.company
             entity = bid.entity
             price = bid.price
-            @log << "#{entity.name} bids #{@game.format_currency(price)} for #{company.name}"
+            min = min_bid(company)
+            raise GameError, "Minimum bid is #{@game.format_currency(min)} for #{company.name}" if price < min
+            if must_bid_increment_multiple? && ((price - min) % @game.class::MIN_BID_INCREMENT).nonzero?
+              raise GameError, "Must increase bid by a multiple of #{@game.class::MIN_BID_INCREMENT}"
+            end
+            if price > max_bid(entity, company)
+              raise GameError, "Cannot afford bid. Maximum possible bid is #{max_bid(entity, company)}"
+            end
 
-            super
+            @log << "#{entity.name} bids #{@game.format_currency(price)} for #{company.name}"
+            bids = @bids[company]
+            bids.reject! { |b| b.entity == entity }
+            bids << bid
+
+            check_remove_from_auction(bid.entity) if @auctioning
             resolve_bids
           end
 
