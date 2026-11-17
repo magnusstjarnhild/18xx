@@ -277,4 +277,20 @@ describe Engine::Game::G1866::Game do
       expect(routes).not_to include(corporation)
     end
   end
+
+  describe 'closing at a share price of £0 (§8.2.13)' do
+    let(:game) { described_class.new(%w[a b c], seed: 1) }
+    let(:corporation) { game.corporations.find { |c| game.corporation?(c) } }
+    let(:train) { game.depot.upcoming.first }
+
+    before do
+      game.par_corporation(corporation, game.stock_market.par_prices.find { |p| p.types.include?(:par) })
+      game.buy_train(corporation, train, :free)
+    end
+
+    it 'removes its trains from the game' do
+      game.corporation_closes(corporation)
+      expect(train.buyable).to be(false)
+    end
+  end
 end
