@@ -56,4 +56,15 @@ describe Engine::Game::G1866::Game do
       expect(game.hex_operating_rights?(corporation, dover)).to be(true)
     end
   end
+
+  describe 'Spain (§8.1.2)' do
+    let(:game) { described_class.new(%w[a b c], seed: 1) }
+
+    it 'is a single off-board area on the French border' do
+      spain = game.hex_by_id('P4')
+      expect(spain.tile.offboards.size).to eq(1)
+      expect(spain.tile.exits.map { |e| spain.neighbors[e].name }).to eq(%w[O3 O5 P6])
+      expect(game.hex_by_id('R0')).to be_nil
+    end
+  end
 end

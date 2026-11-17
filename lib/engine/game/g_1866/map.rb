@@ -350,12 +350,12 @@ module Engine
           'N18' => 'Venice',
           'N22' => 'Lubjiana',
           'N26' => 'Budapest',
-          'O1' => 'Bilbao',
           'O5' => 'Toulouse',
           'O7' => 'Montpelier',
           'O13' => 'Genoa',
           'O21' => 'Rejika',
           'O23' => 'Zagreb',
+          'P4' => 'Spain',
           'P10' => 'Marseilles',
           'P12' => 'Nice',
           'P18' => 'Bologna',
@@ -363,14 +363,10 @@ module Engine
           'Q17' => 'Florence',
           'Q19' => 'San Marino',
           'Q25' => 'Sarajevo',
-          'R0' => 'Madrid',
-          'R4' => 'Barcelona',
           'R18' => 'Rome',
           'S23' => 'Bari',
-          'T2' => 'Valencia',
           'T12' => 'Cagliari',
           'T20' => 'Naples',
-          'U1' => 'Murcia',
           'V18' => 'Palermo',
           'V20' => 'Catania',
           'B11' => 'Port Token Bonus',
@@ -610,24 +606,6 @@ module Engine
             ['O3'] =>
               'upgrade=cost:120,terrain:mountain;frame=color:#fffbcc',
 
-            # Spain - P0 P2 P4 Q1 Q3 Q5 R2 R4 S1 S3 T2 U1
-            ['T2'] =>
-              'city=revenue:0;icon=image:1866/port,sticky:1;frame=color:#bea481',
-            ['R4'] =>
-              'city=revenue:0;label=Y;frame=color:#bea481',
-            ['U1'] =>
-              'city=revenue:0;frame=color:#bea481',
-            %w[P0 Q1 Q3 S1 S3] =>
-              'frame=color:#bea481',
-            ['R2'] =>
-              'town=revenue:0;frame=color:#bea481',
-            ['P2'] =>
-              'upgrade=cost:60,terrain:hill;frame=color:#bea481',
-            ['Q5'] =>
-              'upgrade=cost:90,terrain:mountain;frame=color:#bea481',
-            ['P4'] =>
-              'upgrade=cost:120,terrain:mountain;frame=color:#bea481',
-
             # Switzerland - L12 L14 L16 M13 M15
             %w[L14 L16] =>
               'city=revenue:0;upgrade=cost:90,terrain:mountain;frame=color:#d6cf81',
@@ -665,14 +643,9 @@ module Engine
               'offboard=revenue:yellow_0|green_50|brown_70|gray_90;path=a:4,b:_0;frame=color:#fde2c5',
 
             # Spain
-            ['O1'] =>
-              'city=revenue:yellow_20|green_30|brown_40|gray_50,slots:1;path=a:0,b:_0;path=a:4,b:_0;path=a:5,b:_0;'\
-              'icon=image:1866/port,sticky:1;frame=color:#bea481',
-            ['R0'] =>
-              'city=revenue:yellow_30|green_50|brown_70|gray_90,slots:1;path=a:3,b:_0;path=a:4,b:_0;path=a:5,b:_0;'\
+            ['P4'] =>
+              'offboard=revenue:yellow_30|green_40|brown_50|gray_60;path=a:2,b:_0;path=a:3,b:_0;path=a:4,b:_0;'\
               'frame=color:#bea481',
-            ['T0'] =>
-              'junction;path=a:3,b:_0;path=a:4,b:_0;path=a:5,b:_0;frame=color:#bea481',
           },
           blue: {
             # Water tiles
@@ -680,9 +653,7 @@ module Engine
               '',
             ['E11'] =>
               'junction;path=a:0,b:_0,terminal:1',
-            ['T4'] =>
-              'junction;path=a:1,b:_0,terminal:1',
-            %w[V2 U13] =>
+            ['U13'] =>
               'junction;path=a:2,b:_0,terminal:1',
             %w[Q11 W17] =>
               'junction;path=a:3,b:_0,terminal:1',
@@ -694,8 +665,6 @@ module Engine
               'junction;path=a:0,b:_0,terminal:1',
             ['U19'] =>
               'junction;path=a:0,b:_0,terminal:1;junction;path=a:5,b:_1,terminal:1',
-            ['U3'] =>
-              'junction;path=a:1,b:_0,terminal:1;junction;path=a:2,b:_1,terminal:1',
             ['P14'] =>
               'path=a:2,b:5;border=edge:5',
             ['Q15'] =>
