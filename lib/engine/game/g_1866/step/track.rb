@@ -13,6 +13,26 @@ module Engine
             super
           end
 
+          def round_state
+            super.merge(track_layers: [])
+          end
+
+          def setup
+            super
+            entity = current_entity
+            @round.track_layers = @game.major_national_corporation?(entity) ? @game.major_national_track_layers(entity) : []
+          end
+
+          def pass_description
+            return super unless track_layer
+
+            'Skip (Track)'
+          end
+
+          def track_layer
+            @round.track_layers.first if @game.major_national_corporation?(current_entity)
+          end
+
           def available_hex(entity, hex)
             return nil if @game.national_corporation?(entity) && !@game.hex_within_national_region?(entity, hex)
             return nil if @game.corporation?(entity) && !@game.hex_operating_rights?(entity, hex)
@@ -32,6 +52,8 @@ module Engine
           end
 
           def get_tile_lay(entity)
+            return if @game.major_national_corporation?(entity) && !track_layer
+
             action = super
             return unless action
             return action if @game.national_corporation?(entity)
@@ -48,6 +70,12 @@ module Engine
 
             old_tile.reframe!(nil)
             hex.tile.reframe!(tile_frame.color, tile_frame.color2) if tile_frame
+          end
+
+          def tile_lay_index
+            return 0 if @game.major_national_corporation?(current_entity)
+
+            super
           end
 
           def log_skip(entity)
@@ -71,6 +99,19 @@ module Engine
 
             super
             @game.after_lay_tile(entity)
+            next_track_layer! if @game.major_national_corporation?(entity)
+          end
+
+          def process_pass(action)
+            return super unless track_layer
+
+            @log << "#{track_layer.name} passes laying track for #{action.entity.name}"
+            next_track_layer!
+          end
+
+          def next_track_layer!
+            @round.track_layers.shift
+            pass! unless track_layer
           end
 
           def try_take_loan(entity, price)
