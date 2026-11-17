@@ -783,13 +783,13 @@ module Engine
         def emergency_issuable_bundles(entity)
           min_price = @depot.min_depot_price
           if !entity.corporation? || !corporation?(entity) || !trains_empty?(entity) || entity.num_ipo_shares.zero? ||
-            entity.cash >= min_price || game_end_corporation_operated?(entity)
+            entity.cash >= min_price || game_end_corporation_operated?(entity) || entity.share_price.price.zero?
             return []
           end
 
           remaining = min_price - entity.cash
           bundles_for_corporation(entity, entity).select do |bundle|
-            max_shares = (remaining / bundle.price_per_share).ceil
+            max_shares = (remaining.to_f / bundle.price_per_share).ceil
             @share_pool.fit_in_bank?(bundle) && bundle.num_shares <= max_shares
           end
         end
