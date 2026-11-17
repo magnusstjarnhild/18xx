@@ -1412,6 +1412,8 @@ module Engine
         def corporation_token_rights!(corporation)
           return if !corporation?(corporation) || !corporation.floated?
 
+          @graph.clear_graph_for(corporation)
+
           corporation.placed_tokens.dup.each do |token|
             next if hex_operating_rights?(corporation, token.hex)
 
