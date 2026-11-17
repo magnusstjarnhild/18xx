@@ -1921,9 +1921,11 @@ module Engine
 
         def setup_nationals
           @corporations.each do |corporation|
-            next unless major_national_corporation?(corporation)
-
-            corporation.shares.each { |share| share.buyable = false if share.index > 4 }
+            if major_national_corporation?(corporation)
+              corporation.shares.each { |share| share.buyable = false if share.index > 4 }
+            elsif minor_national_corporation?(corporation)
+              corporation.shares.each { |share| share.buyable = false unless share.president }
+            end
           end
         end
 
