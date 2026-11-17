@@ -3,19 +3,14 @@
 require 'spec_helper'
 
 describe Engine::Game::G1866::Game do
-  describe 268_711 do
-    it 'does not let a national run through a hex outside its region' do
-      game = fixture_at_action(917)
-      de = game.corporation_by_id('DE')
-      route = Engine::Route.new(
-        game,
-        game.phase,
-        de.trains.first,
-        routes: [],
-        connection_hexes: [%w[E17 E15], %w[E15 F14 G15], %w[G15 H16 H18 G19]],
-      )
+  describe 'national routes (§8.3)' do
+    let(:game) { described_class.new(%w[a b c], seed: 1) }
 
-      expect { route.revenue }.to raise_error(Engine::GameError, 'Nationals can only run within its region')
+    it 'does not let a national run through a hex outside its region' do
+      hexes = %w[F22 F20 F18].map { |h| game.hex_by_id(h) }
+      route = instance_double(Engine::Route, corporation: game.corporation_by_id('PRU'), all_hexes: hexes)
+
+      expect { game.check_distance(route, []) }.to raise_error(Engine::GameError, 'Nationals can only run within its region')
     end
   end
 
