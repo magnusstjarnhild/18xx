@@ -174,4 +174,61 @@ describe Engine::Game::G1866::Game do
       expect { par!(ch, yellow) }.to raise_error(Engine::GameError)
     end
   end
+
+  describe 'major national track lays (§8.2.3.2)' do
+    let(:game) { described_class.new(%w[a b c], seed: 1) }
+    let(:a) { game.players[0] }
+    let(:b) { game.players[1] }
+    let(:ch) { game.corporation_by_id('CH') }
+    let(:round) do
+      game.instance_variable_set(:@round, game.operating_round(1))
+      game.round
+    end
+
+    before do
+      game.company_by_id('C6').owner = b
+      game.forced_formation_national(ch, game.forced_formation_par_prices(ch).last)
+      game.share_pool.transfer_shares(game.share_pool.shares_of(ch).first.to_bundle, a)
+      round
+    end
+
+    it 'gives the director the first tile, then each shareholder in seating order' do
+      expect(game.active_players).to eq([b])
+      round.process_action(Engine::Action::Pass.new(ch))
+      expect(game.active_players).to eq([a])
+    end
+
+    it 'gives each shareholder one tile' do
+      tile = game.tiles.find { |t| t.name == '57' }
+      round.process_action(Engine::Action::LayTile.new(ch, tile: tile, hex: game.hex_by_id('L14'), rotation: 0))
+
+      expect(game.hex_by_id('L14').tile).to eq(tile)
+      expect(game.active_players).to eq([a])
+    end
+
+    it 'offers the next shareholder to skip, not to finish' do
+      round.process_action(Engine::Action::Pass.new(ch))
+      expect(round.active_step.pass_description).to eq('Skip (Track)')
+    end
+
+    it 'only lets the shareholder whose turn it is lay track' do
+      expect(game.valid_actors(Engine::Action::Pass.new(ch))).to eq([b])
+    end
+
+    it 'gives no tiles to Great Britain and Spain, which are only off-board areas' do
+      %w[GB ESP].zip(%w[C1 C5]).each do |national_id, concession_id|
+        national = game.corporation_by_id(national_id)
+        game.company_by_id(concession_id).owner = a
+        game.forced_formation_national(national, game.forced_formation_par_prices(national).last)
+
+        expect(national.owner).to eq(a)
+        expect(game.major_national_track_layers(national)).to be_empty
+      end
+    end
+
+    it 'ends the track step after the last shareholder' do
+      2.times { round.process_action(Engine::Action::Pass.new(ch)) }
+      expect(round.active_step).not_to be_a(Engine::Game::G1866::Step::Track)
+    end
+  end
 end

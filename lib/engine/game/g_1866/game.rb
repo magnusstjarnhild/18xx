@@ -612,11 +612,7 @@ module Engine
                      N14 N16 N18 N20 O17 P18 Q19 R18 R20 S19 P16 Q17],
         }.freeze
 
-        MINOR_NATIONAL_TILE_LAYS = [{ lay: true, upgrade: true, cost: 0 }].freeze
-        NATIONAL_TILE_LAYS = [
-          { lay: true, upgrade: true, cost: 0 },
-          { lay: :not_if_upgraded, upgrade: false, cost: 0 },
-        ].freeze
+        NATIONAL_TILE_LAYS = [{ lay: true, upgrade: true, cost: 0 }].freeze
         TILE_LAYS = [
           { lay: true, upgrade: true, cost: 0 },
           { lay: true, upgrade: true, cost: 10 },
@@ -662,6 +658,18 @@ module Engine
                     :major_national_formed, :major_national_formed_round
 
         def action_processed(_action); end
+
+        def active_players
+          return super unless (player = national_track_layer)
+
+          [player]
+        end
+
+        def valid_actors(action)
+          return super if !(player = national_track_layer) || action.entity != @round.current_entity
+
+          [player]
+        end
 
         def bank_sort(corporations)
           return super unless @round.operating?
@@ -1231,8 +1239,7 @@ module Engine
         end
 
         def tile_lays(entity)
-          return self.class::MINOR_NATIONAL_TILE_LAYS if minor_national_corporation?(entity)
-          return self.class::NATIONAL_TILE_LAYS if major_national_corporation?(entity)
+          return self.class::NATIONAL_TILE_LAYS if national_corporation?(entity)
 
           self.class::TILE_LAYS
         end
@@ -1695,8 +1702,20 @@ module Engine
           corporation.id == self.class::GERMANY_NATIONAL || corporation.id == self.class::ITALY_NATIONAL
         end
 
+        def major_national_track_layers(corporation)
+          director = corporation.owner
+          return [] if !director&.player? || !corporation.coordinates
+
+          @players.rotate(@players.index(director)).select { |p| p.num_shares_of(corporation).positive? }
+        end
+
         def major_national_dividend(corporation)
           self.class::MAJOR_NATIONAL_DIVIDEND[corporation.id]
+        end
+
+        def national_track_layer
+          step = @round.active_step
+          step.track_layer if step.is_a?(G1866::Step::Track)
         end
 
         def major_national_corporation?(corporation)
