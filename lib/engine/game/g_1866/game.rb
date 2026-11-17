@@ -1399,6 +1399,7 @@ module Engine
               token.remove!
             end
           end
+          corporation.trains.each { |t| t.buyable = false }
           corporation.set_cash(0, @bank)
           corporation.close!
           corporation = reset_corporation(corporation)
