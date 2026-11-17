@@ -167,6 +167,7 @@ module Engine
         TRAINS = [
           {
             name: 'L',
+            num: 20,
             distance: [
               {
                 'nodes' => ['city'],
@@ -208,6 +209,7 @@ module Engine
           },
           {
             name: '3',
+            num: 6,
             distance: [
               {
                 'nodes' => %w[city offboard],
@@ -233,6 +235,7 @@ module Engine
           },
           {
             name: '4',
+            num: 5,
             distance: [
               {
                 'nodes' => %w[city offboard],
@@ -255,6 +258,7 @@ module Engine
           },
           {
             name: '5',
+            num: 5,
             distance: [
               {
                 'nodes' => %w[city offboard],
@@ -279,6 +283,7 @@ module Engine
           },
           {
             name: '6',
+            num: 3,
             distance: [
               {
                 'nodes' => %w[city offboard],
@@ -314,6 +319,7 @@ module Engine
           },
           {
             name: '8',
+            num: 2,
             distance: [
               {
                 'nodes' => %w[city offboard],
@@ -349,6 +355,7 @@ module Engine
           },
           {
             name: '10',
+            num: 20,
             distance: [
               {
                 'nodes' => %w[city offboard],
@@ -384,204 +391,44 @@ module Engine
           },
           {
             name: 'INF',
+            num: 18,
             distance: 99,
             price: 0,
             reserved: true,
           },
           {
             name: 'P',
+            num: 5,
             distance: 99,
             price: 75,
           },
           {
             name: 'H',
+            num: 5,
             distance: 99,
             price: 140,
           },
           {
             name: 'M',
+            num: 5,
             distance: 99,
             price: 200,
           },
         ].freeze
 
         # *********** 1866 Specific constants ***********
-        SCENARIO = {
-          'full' => {
-            'cert_limit' => {
-              3 => 33,
-              4 => 28,
-              5 => 23,
-              6 => 19,
-            },
-            'starting_cash' => {
-              3 => 900,
-              4 => 675,
-              5 => 540,
-              6 => 450,
-            },
-            'train_count' => {
-              'L' => 20,
-              '3' => 6,
-              '4' => 5,
-              '5' => 5,
-              '6' => 3,
-              '8' => 2,
-              '10' => 20,
-              'INF' => 18,
-              'P' => 5,
-              'H' => 5,
-              'M' => 5,
-            },
-            'infrastructure_count' => 5,
-            'companies' => %w[C1 C2 C3 C4 C5 C6 M1 M2 M3 M4 M5 M6 M7 M8 M9 M10 ST1 ST2 ST3 ST4 ST5 ST6],
-            'corporations' => %w[LNWR GWR NBR PLM MIDI OU CPS KPS BY KHS SB BH KFN SSFL IFT SFAI SBB GL NRS ZPB MZA L],
-            'national_corporations' => %w[GB FR AHE BNL ESP CH DE PRU HAN BAV WTB SAX IT K2S SAR LV PAP TUS],
-            'corporation_count' => 13,
-            'region_corporations' => {
-              'GB' => %w[LNWR GWR NBR],
-              'FR' => %w[PLM MIDI OU CPS],
-              'AHE' => %w[SB BH KFN],
-              'DE' => %w[KPS BY KHS],
-              'IT' => %w[SSFL IFT SFAI],
-            },
-            'region_corporations_maxcount' => {
-              'GB' => 3,
-              'FR' => 4,
-              'AHE' => 3,
-              'DE' => 3,
-              'IT' => 3,
-            },
-          },
-          'nes' => {
-            'cert_limit' => {
-              3 => 28,
-              4 => 21,
-              5 => 17,
-              6 => 14,
-            },
-            'starting_cash' => {
-              3 => 800,
-              4 => 600,
-              5 => 480,
-              6 => 400,
-            },
-            'train_count' => {
-              'L' => 20,
-              '3' => 4,
-              '4' => 3,
-              '5' => 3,
-              '6' => 2,
-              '8' => 2,
-              '10' => 20,
-              'INF' => 10,
-              'P' => 3,
-              'H' => 3,
-              'M' => 3,
-            },
-            'infrastructure_count' => 3,
-            'companies' => %w[C1 C2 C4 C6 M1 M2 M3 M4 M5 ST1 ST2 ST3 ST4 ST5 ST6],
-            'corporations' => %w[LNWR GWR NBR PLM MIDI OU CPS KPS BY KHS SBB GL NRS L],
-            'national_corporations' => %w[GB FR BNL CH DE PRU HAN BAV WTB SAX],
-            'corporation_count' => 9,
-            'region_corporations' => {
-              'GB' => %w[LNWR GWR NBR],
-              'FR' => %w[PLM MIDI OU CPS],
-              'DE' => %w[KPS BY KHS],
-              'BNL' => %w[GL NRS],
-            },
-            'region_corporations_maxcount' => {
-              'GB' => 3,
-              'FR' => 4,
-              'DE' => 3,
-            },
-          },
-          'ces' => {
-            'cert_limit' => {
-              3 => 28,
-              4 => 21,
-              5 => 17,
-              6 => 14,
-            },
-            'starting_cash' => {
-              3 => 800,
-              4 => 600,
-              5 => 480,
-              6 => 400,
-            },
-            'train_count' => {
-              'L' => 20,
-              '3' => 4,
-              '4' => 3,
-              '5' => 3,
-              '6' => 2,
-              '8' => 2,
-              '10' => 20,
-              'INF' => 15,
-              'P' => 3,
-              'H' => 3,
-              'M' => 3,
-            },
-            'infrastructure_count' => 3,
-            'companies' => %w[C3 C4 C6 M1 M2 M3 M4 M5 M6 M7 M8 M9 M10 ST1 ST2 ST3 ST4 ST5 ST6],
-            'corporations' => %w[KPS BY KHS SB BH KFN SSFL IFT SFAI SBB GL NRS],
-            'national_corporations' => %w[AHE BNL CH DE PRU HAN BAV WTB SAX IT K2S SAR LV PAP TUS],
-            'corporation_count' => 9,
-            'region_corporations' => {
-              'DE' => %w[KPS BY KHS],
-              'AHE' => %w[SB BH KFN],
-              'IT' => %w[SSFL IFT SFAI],
-            },
-            'region_corporations_maxcount' => {
-              'AHE' => 3,
-              'DE' => 3,
-              'IT' => 3,
-            },
-          },
-          'ses' => {
-            'cert_limit' => {
-              3 => 28,
-              4 => 21,
-              5 => 17,
-              6 => 14,
-            },
-            'starting_cash' => {
-              3 => 800,
-              4 => 600,
-              5 => 480,
-              6 => 400,
-            },
-            'train_count' => {
-              'L' => 20,
-              '3' => 4,
-              '4' => 3,
-              '5' => 3,
-              '6' => 2,
-              '8' => 2,
-              '10' => 20,
-              'INF' => 10,
-              'P' => 3,
-              'H' => 3,
-              'M' => 3,
-            },
-            'infrastructure_count' => 3,
-            'companies' => %w[C2 C3 C5 C6 M6 M7 M8 M9 M10 ST1 ST2 ST3 ST4 ST5 ST6],
-            'corporations' => %w[PLM MIDI OU CPS SB BH KFN SSFL IFT SFAI SBB ZPB MZA],
-            'national_corporations' => %w[FR AHE ESP CH IT K2S SAR LV PAP TUS],
-            'corporation_count' => 9,
-            'region_corporations' => {
-              'FR' => %w[PLM MIDI OU CPS],
-              'ESP' => %w[ZPB MZA],
-              'AHE' => %w[SB BH KFN],
-              'IT' => %w[SSFL IFT SFAI],
-            },
-            'region_corporations_maxcount' => {
-              'FR' => 4,
-              'AHE' => 3,
-              'IT' => 3,
-            },
-          },
+        CERT_LIMIT = { 3 => 33, 4 => 28, 5 => 23, 6 => 19 }.freeze
+        STARTING_CASH = { 3 => 900, 4 => 675, 5 => 540, 6 => 450 }.freeze
+
+        CORPORATION_COUNT = 13
+        REGION_CORPORATIONS = {
+          'GB' => %w[LNWR GWR NBR],
+          'FR' => %w[PLM MIDI OU CPS],
+          'AHE' => %w[SB BH KFN],
+          'DE' => %w[KPS BY KHS],
+          'IT' => %w[SSFL IFT SFAI],
         }.freeze
+        NATIONAL_CORPORATIONS = %w[GB FR AHE BNL ESP CH DE PRU HAN BAV WTB SAX IT K2S SAR LV PAP TUS].freeze
 
         C_TILE_LABEL = %w[C1 C2 C3 C4 C5 C6].freeze
         C_TILE_HEX = %w[R18 L24 H10 J6 L12 F22].freeze
@@ -810,7 +657,7 @@ module Engine
 
         STOCK_TURN_TOKEN_PREFIX = 'ST'
 
-        attr_reader :scenario, :game_end_triggered_corporation, :game_end_triggered_round,
+        attr_reader :game_end_triggered_corporation, :game_end_triggered_round,
                     :major_national_formed, :major_national_formed_round
 
         def action_processed(_action); end
@@ -977,20 +824,6 @@ module Engine
           ''
         end
 
-        def game_cert_limit
-          @scenario['cert_limit']
-        end
-
-        def game_companies
-          companies = @scenario['companies']
-          self.class::COMPANIES.select { |c| companies.include?(c[:sym]) }
-        end
-
-        def game_corporations
-          corporations = @scenario['corporations'] + @scenario['national_corporations']
-          self.class::CORPORATIONS.select { |c| corporations.include?(c[:sym]) }
-        end
-
         def game_end_check_stock_market?
           @corp_max_reached ||= @corporations.any? do |c|
             reached = corporation?(c) && c.floated? && c.share_price.end_game_trigger?
@@ -1080,21 +913,8 @@ module Engine
           Array.new(130) { |id| Loan.new(id, @loan_value) }
         end
 
-        def init_optional_rules(optional_rules)
-          opt_rules = super
-          @scenario = init_scenario(opt_rules)
-          opt_rules
-        end
-
         def init_share_pool
           G1866::SharePool.new(self)
-        end
-
-        def init_starting_cash(players, bank)
-          cash = @scenario['starting_cash'][players.size]
-          players.each do |player|
-            bank.spend(cash, player)
-          end
         end
 
         def init_stock_market
@@ -1158,10 +978,6 @@ module Engine
         def num_certs(entity)
           # All players have a Stock Turn Company, this shouldnt count towards the cert limit.
           super - 1
-        end
-
-        def num_trains(train)
-          @scenario['train_count'][train[:name]]
         end
 
         def operating_order
@@ -1341,7 +1157,7 @@ module Engine
           @national_graph = Graph.new(self, home_as_token: true, no_blocking: true)
 
           # Setup the nationals infinite trains
-          @scenario['national_corporations'].each_with_index do |national, index|
+          self.class::NATIONAL_CORPORATIONS.each_with_index do |national, index|
             train = train_by_id("INF-#{index}")
             @depot.remove_train(train)
             train.buyable = false
@@ -1357,19 +1173,9 @@ module Engine
 
           # Setup the infrastructure depot
           @depot_infrastructures = []
-          @infrastructure_trains_h = []
-          @infrastructure_trains_p = []
-          @infrastructure_trains_m = []
-          @scenario['infrastructure_count'].times.each do |index|
-            h_train = train_by_id("H-#{index}")
-            @infrastructure_trains_h << h_train
-
-            p_train = train_by_id("P-#{index}")
-            @infrastructure_trains_p << p_train
-
-            m_train = train_by_id("M-#{index}")
-            @infrastructure_trains_m << m_train
-          end
+          @infrastructure_trains_h = @depot.trains.select { |t| t.name == self.class::INFRASTRUCTURE_HUB }
+          @infrastructure_trains_p = @depot.trains.select { |t| t.name == self.class::INFRASTRUCTURE_PALACE }
+          @infrastructure_trains_m = @depot.trains.select { |t| t.name == self.class::INFRASTRUCTURE_MAIL }
 
           # Randomize and setup the corporations
           setup_corporations
@@ -1713,7 +1519,7 @@ module Engine
           corporation_by_id('AHE').coordinates.reject! { |coordinate| minor_lv.coordinates.include?(coordinate) }
 
           # Check if any of the AH corporations have tokened in Lombardy-Venetia
-          @scenario['region_corporations']['AHE'].each { |c| corporation_token_rights!(corporation_by_id(c)) }
+          self.class::REGION_CORPORATIONS['AHE'].each { |c| corporation_token_rights!(corporation_by_id(c)) }
         end
 
         def forced_formation_national(corporation)
@@ -1842,15 +1648,6 @@ module Engine
 
         def e_train?(train)
           self.class::E_TRAINS.include?(train.name)
-        end
-
-        def init_scenario(optional_rules)
-          scenario_name = 'full'
-          scenario_name = 'nes' if optional_rules.include?(:nes)
-          scenario_name = 'ces' if optional_rules.include?(:ces)
-          scenario_name = 'ses' if optional_rules.include?(:ses)
-
-          self.class::SCENARIO[scenario_name]
         end
 
         def interest_owed(entity)
@@ -2061,34 +1858,17 @@ module Engine
 
           # Select one of the three corporations based in each of GB, France, A-H, Germany & Italy
           starting_corps = []
-          germany_italy = [self.class::GERMANY_NATIONAL, self.class::ITALY_NATIONAL]
-          region_corporation_count = Hash.new { |h, k| h[k] = 0 }
-          @scenario['region_corporations'].each do |_, v|
+          self.class::REGION_CORPORATIONS.each do |_, v|
             corp = corps.find { |c| v.include?(c.name) }
-
-            rights = self.class::CORPORATIONS_OPERATING_RIGHTS[corp.id]
-            corporation_rights = rights.is_a?(Array) ? rights.find { |r| germany_italy.include?(r) } : rights
-            region_corporation_count[corporation_rights] += 1
-
             starting_corps << corp
             corps.delete(corp)
           end
 
           # Include the next 8 corporations in the game
-          corps_count = @scenario['corporation_count'] - @scenario['region_corporations'].size
+          corps_count = self.class::CORPORATION_COUNT - self.class::REGION_CORPORATIONS.size
           corps.each_with_index do |c, index|
             if index < corps_count
-              rights = self.class::CORPORATIONS_OPERATING_RIGHTS[c.id]
-              corporation_rights = rights.is_a?(Array) ? rights.find { |r| germany_italy.include?(r) } : rights
-              region_max = @scenario['region_corporations_maxcount'][corporation_rights] || 99
-              if region_corporation_count[corporation_rights] < region_max
-                starting_corps << c
-                region_corporation_count[corporation_rights] += 1
-              else
-                removed_corporations << c
-                @corporations.delete(c)
-                corps_count += 1
-              end
+              starting_corps << c
             else
               removed_corporations << c
               @corporations.delete(c)
