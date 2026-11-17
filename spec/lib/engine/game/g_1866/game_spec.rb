@@ -260,4 +260,21 @@ describe Engine::Game::G1866::Game do
       expect(minors.flat_map(&:shares).reject(&:president).map(&:buyable)).to all(be(false))
     end
   end
+
+  describe 'losing operating rights (§7.3)' do
+    let(:game) { described_class.new(%w[a b c], seed: 1) }
+    let(:corporation) { game.corporations.find { |c| game.corporation?(c) } }
+    let(:routes) { game.graph.instance_variable_get(:@routes) }
+
+    before do
+      corporation.owner = game.players.first
+      allow(corporation).to receive(:floated?).and_return(true)
+      routes[corporation] = { route_available: true, route_train_purchase: true }
+    end
+
+    it 'forgets the routes the company could run before' do
+      game.corporation_token_rights!(corporation)
+      expect(routes).not_to include(corporation)
+    end
+  end
 end
