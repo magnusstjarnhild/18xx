@@ -253,7 +253,7 @@ module Engine
           },
           {
             name: '5',
-            num: 5,
+            num: 4,
             distance: [
               {
                 'nodes' => %w[city offboard],
