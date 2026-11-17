@@ -30,5 +30,9 @@ describe Engine::Game::G1866::Game do
       expect(event_types('4')).not_to include('infrastructure_m')
       expect(event_types('5')).to include('infrastructure_m')
     end
+
+    it 'has four 5 trains' do
+      expect(game.depot.trains.count { |t| t.name == '5' }).to eq(4)
+    end
   end
 end
