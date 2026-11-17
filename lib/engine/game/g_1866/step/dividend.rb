@@ -15,15 +15,6 @@ module Engine
             super
           end
 
-          def dividend_options(entity)
-            revenue = @game.routes_revenue(routes)
-            dividend_types.to_h do |type|
-              payout = send(type, entity, revenue)
-              payout[:divs_to_corporation] = corporation_dividends(entity, payout[:per_share])
-              [type, payout.merge(share_price_change(entity, total_revenue - payout[:corporation]))]
-            end
-          end
-
           def half(entity, revenue)
             withheld = half_pay_withhold_amount(entity, revenue)
             { corporation: withheld, per_share: payout_per_share(entity, revenue - withheld) }
@@ -73,18 +64,25 @@ module Engine
 
           def share_price_change(entity, revenue = 0)
             return {} if @game.minor_national_corporation?(entity)
+            return { share_direction: :right, share_times: 1 } if @game.major_national_corporation?(entity)
             return { share_direction: :left, share_times: 1 } unless revenue.positive?
 
             price = entity.share_price.price
             times = 0
-            times = 1 if revenue >= price || @game.major_national_corporation?(entity)
-            times = 2 if revenue >= price * 2 && @game.corporation?(entity)
-            times = 3 if revenue >= price * 3 && @game.corporation?(entity)
+            times = 1 if revenue >= price
+            times = 2 if revenue >= price * 2
+            times = 3 if revenue >= price * 3
             if times.positive?
               { share_direction: :right, share_times: times }
             else
               {}
             end
+          end
+
+          def total_revenue
+            return super unless @game.major_national_corporation?(current_entity)
+
+            @game.major_national_dividend(current_entity) * current_entity.total_shares
           end
 
           def withhold(_entity, revenue)

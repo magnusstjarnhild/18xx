@@ -101,4 +101,30 @@ describe Engine::Game::G1866::Game do
       expect(game.upgrades_to?(tile('C27'), tile('C28'))).to be(true)
     end
   end
+
+  describe 'major national dividends (§8.1.2, §8.2.7)' do
+    let(:game) { described_class.new(%w[a b c], seed: 1) }
+    let(:step) { Engine::Game::G1866::Step::Dividend.new(game, game.round) }
+
+    def payout(national_id)
+      national = game.corporation_by_id(national_id)
+      allow(step).to receive(:current_entity).and_return(national)
+      step.dividend_options(national)[:payout]
+    end
+
+    it 'pays the fixed dividend per share from table 15' do
+      expect(payout('DE')[:per_share]).to eq(50)
+      expect(payout('CH')[:per_share]).to eq(10)
+    end
+
+    it 'moves the share price one space right' do
+      expect(payout('GB')).to include(share_direction: :right, share_times: 1)
+    end
+
+    it 'does not buy trains' do
+      buy_train = Engine::Game::G1866::Step::BuyTrain.new(game, game.round)
+      allow(buy_train).to receive(:current_entity).and_return(game.corporation_by_id('DE'))
+      expect(buy_train.actions(game.corporation_by_id('DE'))).to be_empty
+    end
+  end
 end

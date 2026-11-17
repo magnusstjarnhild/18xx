@@ -8,6 +8,8 @@ module Engine
       module Step
         class BuyTrain < Engine::Step::BuyTrain
           def actions(entity)
+            return [] if @game.national_corporation?(entity)
+
             actions = super
             if !actions.empty? && entity.operator? && @game.trains_empty?(entity) && @game.can_take_loan?(entity) &&
               entity.cash < @game.depot.min_depot_price
