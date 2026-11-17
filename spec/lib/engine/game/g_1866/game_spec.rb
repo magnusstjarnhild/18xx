@@ -81,4 +81,24 @@ describe Engine::Game::G1866::Game do
         .to all(be(true))
     end
   end
+
+  describe 'C tiles (§3.4)' do
+    let(:game) { described_class.new(%w[a b c], seed: 1) }
+
+    def tile(name)
+      game.tiles.find { |t| t.name == name }
+    end
+
+    it 'gives each C hex a different one of the seven configurations' do
+      labels = described_class::C_TILE_HEX.map { |h| game.hex_by_id(h).tile.label.to_s }
+      expect(labels.uniq.size).to eq(6)
+      expect(labels - described_class::C_TILE_LABEL).to be_empty
+    end
+
+    it 'keeps the seventh configuration when upgrading (§8.2.3)' do
+      expect(game.upgrades_to?(tile('C25'), tile('C26'))).to be(true)
+      expect(game.upgrades_to?(tile('C25'), tile('C10'))).to be(false)
+      expect(game.upgrades_to?(tile('C27'), tile('C28'))).to be(true)
+    end
+  end
 end
