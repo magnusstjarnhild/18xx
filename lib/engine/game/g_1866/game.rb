@@ -427,7 +427,7 @@ module Engine
         }.freeze
         NATIONAL_CORPORATIONS = %w[GB FR AHE BNL ESP CH DE PRU HAN BAV WTB SAX IT K2S SAR LV PAP TUS].freeze
 
-        C_TILE_LABEL = %w[C1 C2 C3 C4 C5 C6].freeze
+        C_TILE_LABEL = %w[C1 C2 C3 C4 C5 C6 C7].freeze
         C_TILE_HEX = %w[R18 L24 H10 J6 L12 F22].freeze
 
         C_TILE_UPGRADE = {
@@ -449,6 +449,9 @@ module Engine
           'C16' => 'C22',
           'C17' => 'C23',
           'C18' => 'C24',
+          'C25' => 'C26',
+          'C26' => 'C27',
+          'C27' => 'C28',
         }.freeze
 
         COMPANY_STARTING_BID = {
@@ -1827,9 +1830,9 @@ module Engine
         end
 
         def setup_capital_hex
-          capitals = self.class::C_TILE_HEX.sort_by { rand }
-          capitals.each_with_index do |c, index|
-            hex_by_id(c).tile.label = "C#{index + 1}"
+          labels = self.class::C_TILE_LABEL.sort_by { rand }
+          self.class::C_TILE_HEX.zip(labels).each do |hex_id, label|
+            hex_by_id(hex_id).tile.label = label
           end
         end
 
