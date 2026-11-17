@@ -545,6 +545,8 @@ module Engine
         FERRY_TILE_F8 = 'border=edge:1,type:impassable;border=edge:5,type:impassable;path=a:2,b:4'
         FERRY_TILE_H4 = 'border=edge:3,type:impassable;border=edge:5,type:impassable;path=a:0,b:2'
 
+        FORCED_FORMATION_ORDER = %w[CH ESP BNL AHE IT FR DE GB].freeze
+
         GERMANY_NATIONAL = 'DE'
         ITALY_NATIONAL = 'IT'
 
@@ -989,6 +991,7 @@ module Engine
           @current_turn = "OR#{round_num}"
           @turn = round_num
           G1866::Round::Operating.new(self, [
+            G1866::Step::ForcedFormationPar,
             G1866::Step::StockTurnToken,
             Engine::Step::HomeToken,
             G1866::Step::FirstTurnHousekeeping,
@@ -1432,18 +1435,37 @@ module Engine
         def event_formation!
           @log << '-- Event: Forced formation of Major Nationals --'
 
-          # Order: Switzerland, Spain, Benelux, Austro-Hungarian Empire, Italy, France, Germany, Great Britain
-          forced_formation_national(corporation_by_id('CH'))
-          forced_formation_national(corporation_by_id('ESP'))
-          forced_formation_national(corporation_by_id('BNL'))
-          forced_formation_national(corporation_by_id('AHE'))
-          forced_formation_major(corporation_by_id(self.class::ITALY_NATIONAL), %w[K2S SAR LV PAP TUS])
-          forced_formation_national(corporation_by_id('FR'))
-          forced_formation_major(corporation_by_id(self.class::GERMANY_NATIONAL), %w[PRU HAN BAV WTB SAX])
-          forced_formation_national(corporation_by_id('GB'))
+          @forced_formations = self.class::FORCED_FORMATION_ORDER.map { |id| corporation_by_id(id) }
+          forced_formations!
+        end
+
+        def forced_formations!
+          until @forced_formations.empty?
+            return if pending_forced_formation
+
+            corporation = @forced_formations.shift
+            case corporation.id
+            when self.class::GERMANY_NATIONAL
+              forced_formation_major(corporation, %w[PRU HAN BAV WTB SAX])
+            when self.class::ITALY_NATIONAL
+              forced_formation_major(corporation, %w[K2S SAR LV PAP TUS])
+            else
+              forced_formation_national(corporation, forced_formation_par_prices(corporation).last)
+            end
+          end
 
           @graph.clear
           @round.check_operating_order!
+        end
+
+        def pending_forced_formation
+          corporation = @forced_formations&.first
+          corporation if corporation && !corporation.floated? && corporation.par_via_exchange&.owner&.player?
+        end
+
+        def complete_forced_formation!(share_price)
+          forced_formation_national(@forced_formations.shift, share_price)
+          forced_formations!
         end
 
         def event_green_ferries!
@@ -1513,11 +1535,9 @@ module Engine
           self.class::REGION_CORPORATIONS['AHE'].each { |c| corporation_token_rights!(corporation_by_id(c)) }
         end
 
-        def forced_formation_national(corporation)
-          return if !corporation || corporation.floated?
+        def forced_formation_national(corporation, share_price)
+          return if corporation.floated?
 
-          # Set the correct par price
-          share_price = forced_formation_par_prices(corporation).last
           par_corporation(corporation, share_price)
 
           # Find the president and give player the share, and spend the money. The player can go into debt
