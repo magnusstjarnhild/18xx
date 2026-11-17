@@ -659,16 +659,16 @@ module Engine
 
         def action_processed(_action); end
 
-        def active_players
-          return super unless (player = national_track_layer)
+        def acting_for_entity(entity)
+          return super if entity != current_entity || !(player = national_track_layer)
 
-          [player]
+          player
         end
 
-        def valid_actors(action)
-          return super if !(player = national_track_layer) || action.entity != @round.current_entity
+        def acting_for_player(player)
+          return player if !(layer = national_track_layer) || player != current_entity.owner
 
-          [player]
+          layer
         end
 
         def bank_sort(corporations)

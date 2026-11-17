@@ -210,6 +210,22 @@ describe Engine::Game::G1866::Game do
       expect(game.valid_actors(Engine::Action::Pass.new(ch))).to eq([b])
     end
 
+    it 'shows the shareholder whose turn it is as acting for the national' do
+      round.process_action(Engine::Action::Pass.new(ch))
+
+      expect(game.acting_for_entity(ch)).to eq(a)
+      expect(game.valid_actors(Engine::Action::Pass.new(ch))).to eq([a])
+    end
+
+    it 'does not log a shareholder laying track as master mode' do
+      round.process_action(Engine::Action::Pass.new(ch))
+      pass = Engine::Action::Pass.new(ch)
+      pass.user = a.id
+      game.process_action(pass)
+
+      expect(game.log.map(&:message).grep(/Master Mode/)).to be_empty
+    end
+
     it 'gives no tiles to Great Britain and Spain, which are only off-board areas' do
       %w[GB ESP].zip(%w[C1 C5]).each do |national_id, concession_id|
         national = game.corporation_by_id(national_id)
