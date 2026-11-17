@@ -231,4 +231,24 @@ describe Engine::Game::G1866::Game do
       expect(round.active_step).not_to be_a(Engine::Game::G1866::Step::Track)
     end
   end
+
+  describe 'emergency share issuing (§11.1)' do
+    let(:game) { described_class.new(%w[a b c], seed: 1) }
+    let(:corporation) { game.corporations.find { |c| game.corporation?(c) } }
+
+    before do
+      par_price = game.stock_market.par_prices.find { |p| p.types.include?(:par) && p.price > game.depot.min_depot_price }
+      game.par_corporation(corporation, par_price)
+      allow(game).to receive(:bundles_for_corporation).and_return(corporation.ipo_shares.map(&:to_bundle))
+    end
+
+    it 'offers a share when one share covers the cheapest train' do
+      expect(game.emergency_issuable_bundles(corporation).map(&:num_shares).uniq).to eq([1])
+    end
+
+    it 'offers nothing at a share price of £0' do
+      corporation.share_price = game.stock_market.share_price([0, 0])
+      expect(game.emergency_issuable_bundles(corporation)).to be_empty
+    end
+  end
 end
