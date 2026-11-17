@@ -329,4 +329,13 @@ describe Engine::Game::G1866::Game do
       expect(game.log.map(&:message)).to include('CH operates without any president')
     end
   end
+
+  describe 'major national shares' do
+    let(:game) { described_class.new(%w[a b c], seed: 1) }
+
+    it 'are counted in whole shares, the bank half included' do
+      majors = game.corporations.select { |c| game.major_national_corporation?(c) }
+      expect(majors.map(&:fraction_shares)).to all(be(false))
+    end
+  end
 end
