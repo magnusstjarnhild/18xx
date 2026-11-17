@@ -304,4 +304,29 @@ describe Engine::Game::G1866::Game do
       expect(train.buyable).to be(false)
     end
   end
+
+  describe 'major national formed without a concession holder (§10.2.3)' do
+    let(:game) { described_class.new(%w[a b c], seed: 1) }
+    let(:ch) { game.corporation_by_id('CH') }
+
+    before do
+      allow(game).to receive(:phase_par_type).and_return(:par_2)
+      allow(game.round).to receive(:check_operating_order!)
+      game.event_formation!
+    end
+
+    it 'has no shareholders and no track' do
+      expect(ch.num_player_shares).to eq(0)
+      expect(game.major_national_track_layers(ch)).to be_empty
+    end
+
+    it 'rises one space every operating round' do
+      par = ch.share_price
+      game.instance_variable_set(:@round, game.operating_round(1))
+      game.round.setup
+
+      expect(ch.share_price).to eq(game.stock_market.share_price(par.coordinates.then { |r, c| [r, c + 1] }))
+      expect(game.log.map(&:message)).to include('CH operates without any president')
+    end
+  end
 end
