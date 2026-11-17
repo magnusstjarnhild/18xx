@@ -50,12 +50,6 @@ module Engine
             hex.tile.reframe!(tile_frame.color, tile_frame.color2) if tile_frame
           end
 
-          def legal_tile_rotation?(entity, hex, tile)
-            return true if hex.name == @game.class::LONDON_HEX
-
-            super
-          end
-
           def log_skip(entity)
             if @game.game_end_triggered_last_round?
               @log << "Last round, #{entity.name} may not lay any track"
@@ -73,11 +67,6 @@ module Engine
             end
             if @game.corporation?(entity) && !@game.hex_operating_rights?(entity, hex)
               raise GameError, 'Cannot lay or upgrade tiles without operating rights in the selected region'
-            end
-
-            # Special case for London
-            if hex.name == @game.class::LONDON_HEX && hex.tile.color == :brown && action.tile.color == :gray
-              hex.tile.cities[1].remove_all_reservations!
             end
 
             super

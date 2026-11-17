@@ -420,7 +420,6 @@ module Engine
 
         CORPORATION_COUNT = 13
         REGION_CORPORATIONS = {
-          'GB' => %w[LNWR GWR NBR],
           'FR' => %w[PLM MIDI OU CPS],
           'AHE' => %w[SB BH KFN],
           'DE' => %w[KPS BY KHS],
@@ -491,9 +490,6 @@ module Engine
         }.freeze
 
         CORPORATIONS_OPERATING_RIGHTS = {
-          'LNWR' => 'GB',
-          'GWR' => 'GB',
-          'NBR' => 'GB',
           'PLM' => 'FR',
           'MIDI' => 'FR',
           'OU' => 'FR',
@@ -549,9 +545,6 @@ module Engine
 
         LOCAL_TRAIN = 'L'
 
-        LONDON_HEX = 'F6'
-        LONDON_TILE = 'L1'
-
         MINOR_COMPANIES = %w[M1 M2 M3 M4 M5 M6 M7 M8 M9 M10].freeze
         MINOR_COMPANY_CORPORATION = {
           'M1' => 'PRU',
@@ -598,7 +591,7 @@ module Engine
           'BNL' => %w[E13 F8 F10 F12 F14 G9 G11 G13 H10 H12 I11],
           'FR' => %w[G7 H4 H8 I1 I3 I5 I7 I9 J0 J2 J4 J6 J8 J10 J12 K1 K3 K5 K7 K9 K11 K13 L2 L4 L6 L8 L10
                      M3 M5 M7 M9 M11 N2 N4 N6 N8 N10 O3 O5 O7 O9 O11 P6 P8 P10 P12 Q13 R12],
-          'GB' => %w[A3 B2 B4 C3 C5 D2 D4 D6 E1 E3 E5 E7 F2 F4 F6 F8 G1 G3 G5 G7 H4],
+          'GB' => %w[E7 F8 G3 G5 G7 H4],
           'ESP' => %w[O1 P0 P2 P4 Q1 Q3 Q5 R0 R2 R4 S1 S3 T0 T2 U1],
           'CH' => %w[L12 L14 L16 M13 M15],
           'DE' => %w[E23 E25 F20 F22 F24 F26 G15 G17 G19 G21 G23 G25 H14 H16 H18 H24 H26 I25 D18 E15 E17
@@ -1141,9 +1134,6 @@ module Engine
             @stock_turn_token_number[player] = 0
           end
 
-          @london_reservation_entity = corporation_by_id('L')
-          @corporations.delete(@london_reservation_entity)
-
           @current_turn = 'ISR'
 
           @major_national_formed = {}
@@ -1302,9 +1292,6 @@ module Engine
         end
 
         def upgrades_to?(from, to, _special = false, selected_company: nil)
-          # London
-          return to.name == self.class::LONDON_TILE if from.hex.name == self.class::LONDON_HEX && from.color == :brown
-
           # C-tiles
           if self.class::C_TILE_LABEL.include?(from.label.to_s) && %i[yellow green brown].include?(from.color)
             return C_TILE_UPGRADE[from.name] == to.name
