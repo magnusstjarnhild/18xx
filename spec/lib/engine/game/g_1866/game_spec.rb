@@ -251,4 +251,13 @@ describe Engine::Game::G1866::Game do
       expect(game.emergency_issuable_bundles(corporation)).to be_empty
     end
   end
+
+  describe 'minor nationals (§8.1.3)' do
+    let(:game) { described_class.new(%w[a b c], seed: 1) }
+
+    it 'keeps the bank half out of reach' do
+      minors = game.corporations.select { |c| game.minor_national_corporation?(c) }
+      expect(minors.flat_map(&:shares).reject(&:president).map(&:buyable)).to all(be(false))
+    end
+  end
 end
