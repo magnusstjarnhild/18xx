@@ -35,4 +35,25 @@ describe Engine::Game::G1866::Game do
       expect(game.depot.trains.count { |t| t.name == '5' }).to eq(4)
     end
   end
+
+  describe 'Great Britain (§8.1.2)' do
+    let(:game) { described_class.new(%w[a b c], seed: 1) }
+    let(:player) { game.players.first }
+    let(:corporation) { game.corporations.find { |c| game.corporation?(c) } }
+    let(:dover) { game.hex_by_id('G5') }
+
+    before { corporation.owner = player }
+
+    it 'is only off-board areas reached by ferry' do
+      expect(%w[E7 G3 G5].map { |h| game.hex_by_id(h).tile.offboards.size }).to eq([1, 1, 1])
+      expect(game.hex_by_id('F6')).to be_nil
+    end
+
+    it 'needs a GB share to run there' do
+      expect(game.hex_operating_rights?(corporation, dover)).to be(false)
+
+      game.share_pool.transfer_shares(game.corporation_by_id('GB').shares[1].to_bundle, player)
+      expect(game.hex_operating_rights?(corporation, dover)).to be(true)
+    end
+  end
 end

@@ -290,14 +290,6 @@ module Engine
                 'city=revenue:90,slots:1;path=a:2,b:_1;path=a:5,b:_1;'\
                 'city=revenue:90,slots:1;path=a:0,b:_2;path=a:3,b:_2;label=C6',
             },
-          'L1' =>
-            {
-              'count' => 1,
-              'color' => 'gray',
-              'code' =>
-                'city=revenue:90,slots:3;path=a:0,b:_0;path=a:1,b:_0;path=a:2,b:_0;path=a:3,b:_0;'\
-                'label=L',
-            },
         }.freeze
 
         LOCATION_NAMES = {
@@ -311,23 +303,16 @@ module Engine
           'B21' => 'Lombardy-Venetia',
           'B23' => 'Papal States',
           'B25' => 'Tuscany',
-          'A3' => 'Scotland',
-          'D2' => 'Liverpool',
-          'D4' => 'Manchester',
-          'D6' => 'York',
-          'E1' => 'Cardiff',
-          'E3' => 'Birmingham',
           'E17' => 'Hamburg',
           'E19' => 'Lubeck',
           'E25' => 'Gdansk',
-          'F2' => 'Bristol',
-          'F6' => 'London',
           'F10' => 'Rotterdam',
           'F12' => 'Amsterdam',
           'F18' => 'Hannover',
           'F22' => 'Berlin',
-          'G1' => 'Plymouth',
+          'E7' => 'East Anglia',
           'G3' => 'Southampton',
+          'G5' => 'Dover',
           'G9' => 'Bruges',
           'G11' => 'Antwerp',
           'H8' => 'Calais',
@@ -625,30 +610,6 @@ module Engine
             ['O3'] =>
               'upgrade=cost:120,terrain:mountain;frame=color:#fffbcc',
 
-            # Great Britain - A3 B2 B4 C3 C5 D2 D4 D6 E1 E3 E5 E7 F2 F4 F6 G1 G3 G5
-            ['G5'] =>
-              'border=edge:0,type:impassable;frame=color:#fde2c5',
-            ['E7'] =>
-              'border=edge:2,type:impassable;frame=color:#fde2c5',
-            ['D6'] =>
-              'city=revenue:0;border=edge:5,type:impassable;frame=color:#fde2c5',
-            %w[E1 E3 G1 G3] =>
-              'city=revenue:0;frame=color:#fde2c5',
-            ['D2'] =>
-              'city=revenue:0;icon=image:1866/port,sticky:1;frame=color:#fde2c5',
-            ['F2'] =>
-              'city=revenue:0;upgrade=cost:40,terrain:swamp;icon=image:1866/port,sticky:1;frame=color:#fde2c5',
-            ['D4'] =>
-              'city=revenue:0;upgrade=cost:60,terrain:hill;label=Y;frame=color:#fde2c5',
-            ['E5'] =>
-              'frame=color:#fde2c5',
-            %w[C3 F4] =>
-              'town=revenue:0;frame=color:#fde2c5',
-            ['B4'] =>
-              'town=revenue:0;upgrade=cost:60,terrain:hill;frame=color:#fde2c5',
-            %w[B2 C5] =>
-              'upgrade=cost:60,terrain:hill;frame=color:#fde2c5',
-
             # Spain - P0 P2 P4 Q1 Q3 Q5 R2 R4 S1 S3 T2 U1
             ['T2'] =>
               'city=revenue:0;icon=image:1866/port,sticky:1;frame=color:#bea481',
@@ -675,16 +636,6 @@ module Engine
             %w[M13 M15] =>
               'upgrade=cost:120,terrain:mountain;frame=color:#d6cf81',
           },
-          brown: {
-            # London
-            ['F6'] =>
-              'city=revenue:yellow_30|green_50|brown_70;path=a:0,b:_0;'\
-              'city=revenue:yellow_30|green_50|brown_70;path=a:1,b:_1;'\
-              'city=revenue:yellow_30|green_50|brown_70;path=a:2,b:_2;'\
-              'city=revenue:yellow_30|green_50|brown_70;path=a:3,b:_3;'\
-              'border=edge:4,type:impassable;border=edge:5,type:impassable;'\
-              'label=L;frame=color:#fde2c5',
-          },
           gray: {
             # Germany - Prussia
             ['F26'] =>
@@ -708,9 +659,10 @@ module Engine
               'junction;path=a:3,b:_0;path=a:4,b:_0;path=a:5,b:_0;frame=color:#fffbcc',
 
             # Great Britain
-            ['A3'] =>
-              'city=revenue:yellow_20|green_30|brown_40|gray_50,slots:2;path=a:0,b:_0,terminal:1;'\
-              'path=a:5,b:_0,terminal:1;icon=image:1866/port,sticky:1;frame=color:#fde2c5',
+            %w[E7 G3] =>
+              'offboard=revenue:yellow_0|green_0|brown_70|gray_90;path=a:5,b:_0;frame=color:#fde2c5',
+            ['G5'] =>
+              'offboard=revenue:yellow_0|green_50|brown_70|gray_90;path=a:4,b:_0;frame=color:#fde2c5',
 
             # Spain
             ['O1'] =>
@@ -726,20 +678,20 @@ module Engine
             # Water tiles
             ['H6'] =>
               '',
-            %w[C7 E11] =>
+            ['E11'] =>
               'junction;path=a:0,b:_0,terminal:1',
             ['T4'] =>
               'junction;path=a:1,b:_0,terminal:1',
             %w[V2 U13] =>
               'junction;path=a:2,b:_0,terminal:1',
-            %w[F0 H0 Q11 W17] =>
+            %w[Q11 W17] =>
               'junction;path=a:3,b:_0,terminal:1',
             ['R16'] =>
               'junction;path=a:4,b:_0,terminal:1',
             %w[D24 M1 R22 S11] =>
               'junction;path=a:5,b:_0,terminal:1',
             ['H2'] =>
-              'junction;path=a:0,b:_0,terminal:1;junction;path=a:2,b:_1,terminal:1',
+              'junction;path=a:0,b:_0,terminal:1',
             ['U19'] =>
               'junction;path=a:0,b:_0,terminal:1;junction;path=a:5,b:_1,terminal:1',
             ['U3'] =>
