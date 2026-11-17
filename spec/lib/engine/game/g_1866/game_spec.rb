@@ -18,4 +18,17 @@ describe Engine::Game::G1866::Game do
       expect { route.revenue }.to raise_error(Engine::GameError, 'Nationals can only run within its region')
     end
   end
+
+  describe 'trains' do
+    let(:game) { described_class.new(%w[a b c], seed: 1) }
+
+    def event_types(train_name)
+      game.depot.trains.find { |t| t.name == train_name }.events.map { |e| e['type'] }
+    end
+
+    it 'makes the mail contract available with the first 5 train' do
+      expect(event_types('4')).not_to include('infrastructure_m')
+      expect(event_types('5')).to include('infrastructure_m')
+    end
+  end
 end
