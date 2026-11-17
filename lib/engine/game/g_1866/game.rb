@@ -418,7 +418,7 @@ module Engine
         CERT_LIMIT = { 3 => 33, 4 => 28, 5 => 23, 6 => 19 }.freeze
         STARTING_CASH = { 3 => 900, 4 => 675, 5 => 540, 6 => 450 }.freeze
 
-        CORPORATION_COUNT = 13
+        CORPORATION_COUNT = 11
         REGION_CORPORATIONS = {
           'FR' => %w[PLM MIDI OU CPS],
           'AHE' => %w[SB BH KFN],
@@ -898,8 +898,7 @@ module Engine
         def init_loans
           @loan_value = 100
 
-          # 13 corporations * 10 loans
-          Array.new(130) { |id| Loan.new(id, @loan_value) }
+          Array.new(self.class::CORPORATION_COUNT * 10) { |id| Loan.new(id, @loan_value) }
         end
 
         def init_share_pool
@@ -1839,7 +1838,7 @@ module Engine
           corps = @corporations.select { |c| c.type == :share_5 }.sort_by { rand }
           removed_corporations = []
 
-          # Select one of the three corporations based in each of GB, France, A-H, Germany & Italy
+          # Select one of the corporations based in each of France, A-H, Germany & Italy
           starting_corps = []
           self.class::REGION_CORPORATIONS.each do |_, v|
             corp = corps.find { |c| v.include?(c.name) }
@@ -1847,7 +1846,7 @@ module Engine
             corps.delete(corp)
           end
 
-          # Include the next 8 corporations in the game
+          # Fill up with random corporations from all regions
           corps_count = self.class::CORPORATION_COUNT - self.class::REGION_CORPORATIONS.size
           corps.each_with_index do |c, index|
             if index < corps_count

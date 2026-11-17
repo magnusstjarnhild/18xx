@@ -67,4 +67,18 @@ describe Engine::Game::G1866::Game do
       expect(game.hex_by_id('R0')).to be_nil
     end
   end
+
+  describe 'setup (§3.1)' do
+    let(:game) { described_class.new(%w[a b c], seed: 1) }
+    let(:in_play) { game.corporations.select { |c| game.corporation?(c) } }
+
+    it 'puts 11 public companies in play' do
+      expect(in_play.size).to eq(11)
+    end
+
+    it 'includes a public company from each of France, A-H, Germany and Italy' do
+      expect(described_class::REGION_CORPORATIONS.values.map { |ids| in_play.any? { |c| ids.include?(c.id) } })
+        .to all(be(true))
+    end
+  end
 end
