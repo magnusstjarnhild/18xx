@@ -389,7 +389,7 @@ module Engine
           },
           {
             name: 'INF',
-            num: 18,
+            num: 10,
             distance: 99,
             price: 0,
             reserved: true,
@@ -425,7 +425,16 @@ module Engine
           'DE' => %w[KPS BY KHS],
           'IT' => %w[SSFL IFT SFAI],
         }.freeze
-        NATIONAL_CORPORATIONS = %w[GB FR AHE BNL ESP CH DE PRU HAN BAV WTB SAX IT K2S SAR LV PAP TUS].freeze
+        MAJOR_NATIONAL_DIVIDEND = {
+          'GB' => 35,
+          'DE' => 50,
+          'IT' => 50,
+          'FR' => 40,
+          'AHE' => 40,
+          'BNL' => 25,
+          'ESP' => 25,
+          'CH' => 10,
+        }.freeze
 
         C_TILE_LABEL = %w[C1 C2 C3 C4 C5 C6 C7].freeze
         C_TILE_HEX = %w[R18 L24 H10 J6 L12 F22].freeze
@@ -600,8 +609,6 @@ module Engine
           'IT' => %w[R12 S21 S23 S25 T20 T22 T24 U21 V18 V20 W19 N12 O13 O15 P14 Q15 R14 S13 S15 S17 T12 T14 T16 T18 M17
                      N14 N16 N18 N20 O17 P18 Q19 R18 R20 S19 P16 Q17],
         }.freeze
-
-        NATIONAL_PREPRINTED_TILES = %w[AHE DE ESP].freeze
 
         MINOR_NATIONAL_TILE_LAYS = [{ lay: true, upgrade: true, cost: 0 }].freeze
         NATIONAL_TILE_LAYS = [
@@ -1144,20 +1151,19 @@ module Engine
           # Setup the nationals graph
           @national_graph = Graph.new(self, home_as_token: true, no_blocking: true)
 
-          # Setup the nationals infinite trains
-          self.class::NATIONAL_CORPORATIONS.each_with_index do |national, index|
+          # Setup the minor nationals infinite trains
+          @corporations.select { |c| minor_national_corporation?(c) }.each_with_index do |corporation, index|
             train = train_by_id("INF-#{index}")
             @depot.remove_train(train)
             train.buyable = false
             train.instance_variable_set(:@local, true)
 
-            corporation = corporation_by_id(national)
             train.owner = corporation
             corporation.trains << train
-
-            # Before Italy is formed AHE can access the Lombardy-Venetia region
-            corporation.coordinates.concat(corporation_by_id('LV').coordinates) if national == 'AHE'
           end
+
+          # Before Italy is formed AHE can access the Lombardy-Venetia region
+          corporation_by_id('AHE').coordinates.concat(corporation_by_id('LV').coordinates)
 
           # Setup the infrastructure depot
           @depot_infrastructures = []
@@ -1669,6 +1675,10 @@ module Engine
           corporation.id == self.class::GERMANY_NATIONAL || corporation.id == self.class::ITALY_NATIONAL
         end
 
+        def major_national_dividend(corporation)
+          self.class::MAJOR_NATIONAL_DIVIDEND[corporation.id]
+        end
+
         def major_national_corporation?(corporation)
           return false unless corporation
 
@@ -1692,18 +1702,6 @@ module Engine
             hexes.concat(self.class::NATIONAL_REGION_HEXES['LV'])
           end
           hexes
-        end
-
-        def national_upgraded?(corporation)
-          return true if self.class::NATIONAL_PREPRINTED_TILES.include?(corporation.id)
-
-          hexes = national_hexes(corporation.id)
-          hexes.any? do |h|
-            hex = hex_by_id(h)
-            next unless hex.tile.cities.size.positive?
-
-            hex.tile != hex.original_tile
-          end
         end
 
         def operating_rights(entity)

@@ -49,11 +49,7 @@ module Engine
               @log << "#{entity.name} operates without any president"
 
               current_price = entity.share_price.price
-              if @game.national_upgraded?(entity)
-                @game.stock_market.move_right(entity)
-              else
-                @game.stock_market.move_left(entity)
-              end
+              @game.stock_market.move_right(entity)
 
               @log << "#{entity.name}'s share price changes from #{@game.format_currency(current_price)} "\
                       "to #{@game.format_currency(entity.share_price.price)}"
