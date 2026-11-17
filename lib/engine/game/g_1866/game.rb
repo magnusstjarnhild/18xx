@@ -250,11 +250,6 @@ module Engine
             ],
             price: 300,
             rusts_on: '8',
-            events: [
-              {
-                'type' => 'infrastructure_m',
-              },
-            ],
           },
           {
             name: '5',
@@ -278,6 +273,9 @@ module Engine
               },
               {
                 'type' => 'formation',
+              },
+              {
+                'type' => 'infrastructure_m',
               },
             ],
           },
