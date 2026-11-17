@@ -127,4 +127,51 @@ describe Engine::Game::G1866::Game do
       expect(buy_train.actions(game.corporation_by_id('DE'))).to be_empty
     end
   end
+
+  describe 'forced formation (§10.2.3)' do
+    let(:game) { described_class.new(%w[a b c], seed: 1) }
+    let(:player) { game.players.first }
+    let(:step) { Engine::Game::G1866::Step::ForcedFormationPar.new(game, game.round) }
+    let(:ch) { game.corporation_by_id('CH') }
+    let(:esp) { game.corporation_by_id('ESP') }
+    let(:bnl) { game.corporation_by_id('BNL') }
+
+    def par!(corporation, share_price)
+      step.process_par(Engine::Action::Par.new(player, corporation: corporation, share_price: share_price))
+    end
+
+    before do
+      %w[C6 C4].each { |id| game.company_by_id(id).owner = player }
+      allow(game).to receive(:phase_par_type).and_return(:par_2)
+      allow(game.round).to receive(:check_operating_order!)
+      game.event_formation!
+    end
+
+    it 'waits for the concession holder to choose a price' do
+      expect(game.pending_forced_formation).to eq(ch)
+      expect(step.active_entities).to eq([player])
+    end
+
+    it 'lets the holder choose any legal price' do
+      highest = step.get_par_prices(player, ch).first
+      cash = player.cash
+      par!(ch, highest)
+
+      expect(ch.share_price).to eq(highest)
+      expect(player.cash).to eq(cash - highest.price)
+      expect(game.pending_forced_formation).to eq(bnl)
+    end
+
+    it 'forms a concession nobody bought at the lowest legal price' do
+      lowest = step.get_par_prices(player, esp).last
+      par!(ch, step.get_par_prices(player, ch).first)
+
+      expect(esp.share_price).to eq(lowest)
+    end
+
+    it 'rejects a price outside the brown zone' do
+      yellow = game.stock_market.par_prices.find { |p| p.types.include?(:par) }
+      expect { par!(ch, yellow) }.to raise_error(Engine::GameError)
+    end
+  end
 end
